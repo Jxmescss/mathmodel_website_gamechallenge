@@ -44,7 +44,7 @@ p { color: #aaa; margin-bottom: 25px; }
 .input-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
 
 .digit-input {
-    width: 50px; height: 70px; /* ปรับขนาดให้พอดีกับ 7 ช่อง */
+    width: 50px; height: 70px;
     font-size: 2.5rem;
     font-family: 'Orbitron', sans-serif;
     text-align: center;
@@ -75,19 +75,6 @@ p { color: #aaa; margin-bottom: 25px; }
 .btn-secondary:hover { border-color: #fff; color: #fff; }
 
 /* Game UI */
-.reference-row {
-    display: flex; justify-content: center; gap: 15px;
-    margin-bottom: 20px;
-    background: rgba(255,255,255,0.05);
-    padding: 15px;
-    border-radius: 15px;
-}
-.ref-digit {
-    font-size: 3.5rem; font-family: 'Orbitron', sans-serif;
-    color: #fff; text-shadow: 0 0 10px var(--neon-blue);
-    opacity: 0.9;
-}
-
 .solution-area { margin-bottom: 20px; }
 .solution-input {
     width: 80%; max-width: 600px; padding: 15px 20px;
@@ -96,9 +83,9 @@ p { color: #aaa; margin-bottom: 25px; }
     border: 2px solid var(--neon-pink); border-radius: 15px;
     color: var(--neon-pink); text-align: center;
     outline: none; transition: 0.3s;
+    letter-spacing: 2px; /* ห่างนิดนึงให้ดูง่าย */
 }
 .solution-input:focus { box-shadow: 0 0 25px rgba(255, 0, 127, 0.4); background: #000; }
-.solution-input::placeholder { color: rgba(255, 255, 255, 0.2); font-size: 1.2rem; }
 
 .operator-bank { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
 .op-btn {

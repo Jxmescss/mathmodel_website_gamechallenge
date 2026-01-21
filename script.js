@@ -1,7 +1,7 @@
 const inputs = document.querySelectorAll('.digit-input');
 const setupMsg = document.getElementById('setupMessage');
 
-// เก็บโจทย์ต้นฉบับไว้เทียบ
+// เก็บโจทย์ต้นฉบับ
 let currentProblemDigits = []; 
 
 // --- 1. Setup Logic ---
@@ -35,7 +35,6 @@ function startGame() {
         return;
     }
 
-    // เก็บโจทย์เป็น Array เช่น ['1', '5', '3'...]
     currentProblemDigits = inputString.split('');
 
     document.getElementById('setupPage').style.display = 'none';
@@ -58,110 +57,74 @@ function resetGame() {
     currentProblemDigits = []; 
 }
 
-// --- 2. Game Logic (Strict Input) ---
+// --- 2. Game Logic ---
 
 function setupGameDisplay(digitString) {
     const solutionInput = document.getElementById('playerSolution');
     
-    // 1. ใส่ตัวเลขลงไปในกล่องทันที
+    // ใส่เลขลงกล่อง
     solutionInput.value = digitString; 
     
-    // 2. ป้องกันการ Copy / Cut / Paste (กันการโกง)
+    // ห้าม Copy/Paste
     solutionInput.onpaste = (e) => e.preventDefault();
     solutionInput.oncut = (e) => e.preventDefault();
     
-    // 3. ดักจับการกดปุ่ม (หัวใจหลักของระบบล็อกเลข)
+    // ระบบล็อกตัวเลข (ไม่ให้พิมพ์เพิ่ม / ไม่ให้ลบตัวเดิม)
     solutionInput.onkeydown = function(e) {
-        // อนุญาตปุ่มควบคุม: ลูกศรซ้ายขวา, Home, End
-        if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Tab'].includes(e.key)) {
-            return;
-        }
+        if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Tab'].includes(e.key)) return;
+        if (['+', '-', '*', '/', '(', ')', '.'].includes(e.key)) return;
 
-        // อนุญาตปุ่มเครื่องหมาย: + - * / ( ) .
-        if (['+', '-', '*', '/', '(', ')', '.'].includes(e.key)) {
-            return; // ปล่อยให้พิมพ์ได้
-        }
-
-        // จัดการปุ่ม Backspace (ลบ)
         if (e.key === 'Backspace') {
             const cursorStart = this.selectionStart;
             const cursorEnd = this.selectionEnd;
-
-            // ถ้ามีการลากคลุมดำ (Selection)
             if (cursorStart !== cursorEnd) {
                 const selectedText = this.value.substring(cursorStart, cursorEnd);
-                // ถ้าในส่วนที่คลุมดำ มีตัวเลขผสมอยู่ -> ห้ามลบ!
-                if (/[0-9]/.test(selectedText)) {
-                    e.preventDefault();
-                }
+                if (/[0-9]/.test(selectedText)) e.preventDefault();
                 return;
             }
-
-            // ถ้าลบตัวเดียว
             if (cursorStart > 0) {
                 const charToDelete = this.value[cursorStart - 1];
-                // เช็คว่าตัวที่จะลบเป็นตัวเลขไหม? ถ้าใช่ -> ห้ามลบ!
-                if (/[0-9]/.test(charToDelete)) {
-                    e.preventDefault();
-                }
+                if (/[0-9]/.test(charToDelete)) e.preventDefault();
             }
             return;
         }
 
-        // จัดการปุ่ม Delete (ลบไปข้างหน้า)
         if (e.key === 'Delete') {
-            const cursorStart = this.selectionStart;
-            const charToDelete = this.value[cursorStart];
-            // ถ้าตัวที่จะลบเป็นตัวเลข -> ห้ามลบ!
-            if (charToDelete && /[0-9]/.test(charToDelete)) {
-                e.preventDefault();
-            }
+            const charToDelete = this.value[this.selectionStart];
+            if (charToDelete && /[0-9]/.test(charToDelete)) e.preventDefault();
             return;
         }
 
-        // บล็อกปุ่มอื่นๆ ทั้งหมด (รวมถึงตัวเลข 0-9 และตัวอักษร)
-        // เพื่อไม่ให้พิมพ์เลขเพิ่ม หรือพิมพ์ตัวอักษรมั่ว
+        // บล็อกปุ่มอื่นๆ (รวมถึงตัวเลข)
         e.preventDefault();
     };
 
-    // คำนวณค่าเริ่มต้น (เพื่อเช็ค validation)
     calculate();
     solutionInput.focus();
     solutionInput.oninput = calculate;
 }
 
-// ฟังก์ชันสำหรับปุ่มกดบนหน้าจอ (Insert Text)
 function insertText(text) {
     const input = document.getElementById('playerSolution');
     const start = input.selectionStart;
     const end = input.selectionEnd;
 
-    // แทรกข้อความตรงตำแหน่ง Cursor
     const val = input.value;
     input.value = val.slice(0, start) + text + val.slice(end);
-    
-    // ขยับ Cursor ไปหลังตัวที่เพิ่งพิมพ์
     input.selectionStart = input.selectionEnd = start + text.length;
     input.focus();
     
     calculate();
 }
 
-// ฟังก์ชันจำลองปุ่ม Backspace บนหน้าจอ
 function simulateBackspace() {
     const input = document.getElementById('playerSolution');
     const start = input.selectionStart;
-    
-    // ถ้า Cursor อยู่หน้าสุด ลบไม่ได้
     if (start === 0) return;
 
-    // เช็คตัวข้างหน้า Cursor
     const charToDelete = input.value[start - 1];
-    
-    // ถ้าเป็นตัวเลข ห้ามลบ
-    if (/[0-9]/.test(charToDelete)) return;
+    if (/[0-9]/.test(charToDelete)) return; // ห้ามลบถ้าเป็นตัวเลข
 
-    // ถ้าไม่ใช่ตัวเลข (เป็นเครื่องหมาย) ให้ลบได้
     const val = input.value;
     input.value = val.slice(0, start - 1) + val.slice(start);
     input.selectionStart = input.selectionEnd = start - 1;
@@ -175,22 +138,23 @@ function calculate() {
     const resDisplay = document.getElementById('currentValue');
     const msg = document.getElementById('message');
 
-    // 1. ตรวจสอบความถูกต้องของลำดับตัวเลข (Index Checking)
-    // ดึงเฉพาะตัวเลขออกมาจากสิ่งที่พิมพ์
-    const currentDigits = expr.replace(/[^0-9]/g, '').split('');
-
-    // เทียบกับโจทย์ต้นฉบับว่าตรงกันทุกตำแหน่งไหม
-    const isOrderCorrect = JSON.stringify(currentDigits) === JSON.stringify(currentProblemDigits);
-
-    if (!isOrderCorrect) {
-        // กรณีนี้ยากจะเกิดขึ้นเพราะเราบล็อกไว้แล้ว แต่กันเหนียวไว้
-        resDisplay.innerText = "Error";
-        resDisplay.style.color = "#ff3131";
-        msg.innerHTML = "<h5>ลำดับตัวเลขไม่ถูกต้อง</h5>";
-        return;
+    // 🔴 1. เช็คว่ามี "เลขโดดต่อกัน" หรือไม่ (Concatenation Check)
+    // RegExp: /\d+/g จะจับกลุ่มตัวเลขทั้งหมด (เช่น "1", "12", "5")
+    const numberGroups = expr.match(/\d+/g);
+    
+    if (numberGroups) {
+        // ถ้ามีกลุ่มไหนยาวกว่า 1 ตัวอักษร (เช่น "12") แสดงว่าเอามาต่อกัน
+        const hasConcatenation = numberGroups.some(num => num.length > 1);
+        
+        if (hasConcatenation) {
+            resDisplay.innerText = "Error";
+            resDisplay.style.color = "#ff3131"; // สีแดง
+            msg.innerHTML = "<h3 style='color:#ff3131'>ห้ามนำเลขโดดมาต่อกัน!</h3>";
+            return; // หยุดคำนวณทันที
+        }
     }
 
-    // ถ้าว่างเปล่า
+    // 🔵 2. เช็ค Validation อื่นๆ
     if (!expr.trim()) {
         resDisplay.innerText = "0.00";
         resDisplay.style.color = "#00d2ff";
