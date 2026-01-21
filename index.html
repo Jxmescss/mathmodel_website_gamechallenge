@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>100 Challenge - Cyberpunk</title>
+    <title>100 Challenge - Strict Input</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -29,12 +29,12 @@
 
         <div id="gamePage" style="display: none;">
             
-            <p class="game-instruction">ใช้ตัวเลขด้านบน สร้างสมการให้ได้ 100</p>
+            <p class="game-instruction">เติมเครื่องหมาย (+ - * /) แทรกระหว่างตัวเลข</p>
 
-            <div id="digitReference" class="reference-row"></div>
+            <div id="digitReference" class="reference-row" style="display:none;"></div>
 
             <div class="solution-area">
-                <input type="text" id="playerSolution" class="solution-input" placeholder="พิมพ์สมการที่นี่..." autocomplete="off">
+                <input type="text" id="playerSolution" class="solution-input" autocomplete="off">
             </div>
 
             <div class="operator-bank">
@@ -44,6 +44,7 @@
                 <button class="op-btn" onclick="insertText('/')">÷</button>
                 <button class="op-btn" onclick="insertText('(')">(</button>
                 <button class="op-btn" onclick="insertText(')')">)</button>
+                <button class="op-btn" onclick="simulateBackspace()" style="color: #ff3131;">⌫</button>
             </div>
 
             <div id="result-panel">
