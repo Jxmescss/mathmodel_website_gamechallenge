@@ -41,11 +41,11 @@ h1 {
 p { color: #aaa; margin-bottom: 25px; }
 
 /* Setup Input */
-.input-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+.input-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
 
 .digit-input {
-    width: 60px; height: 80px; /* ปรับให้ใหญ่ขึ้นนิดหน่อยเพราะมีแค่ 4 ตัว */
-    font-size: 3rem;
+    width: 50px; height: 70px; /* ปรับขนาดให้พอดีกับ 7 ช่อง */
+    font-size: 2.5rem;
     font-family: 'Orbitron', sans-serif;
     text-align: center;
     background: #000;
@@ -76,14 +76,14 @@ p { color: #aaa; margin-bottom: 25px; }
 
 /* Game UI */
 .reference-row {
-    display: flex; justify-content: center; gap: 20px;
+    display: flex; justify-content: center; gap: 15px;
     margin-bottom: 20px;
     background: rgba(255,255,255,0.05);
-    padding: 20px;
+    padding: 15px;
     border-radius: 15px;
 }
 .ref-digit {
-    font-size: 4rem; font-family: 'Orbitron', sans-serif;
+    font-size: 3.5rem; font-family: 'Orbitron', sans-serif;
     color: #fff; text-shadow: 0 0 10px var(--neon-blue);
     opacity: 0.9;
 }

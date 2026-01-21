@@ -1,7 +1,7 @@
 const inputs = document.querySelectorAll('.digit-input');
 const setupMsg = document.getElementById('setupMessage');
 
-// เก็บโจทย์ 4 ตัว
+// เก็บโจทย์ 7 ตัว
 let currentProblemDigits = []; 
 
 // --- 1. Setup Logic ---
@@ -32,11 +32,11 @@ function startGame() {
     });
 
     if (!isComplete) {
-        setupMsg.innerText = "กรุณากรอกตัวเลขให้ครบทั้ง 4 ช่อง";
+        setupMsg.innerText = "กรุณากรอกตัวเลขให้ครบทั้ง 7 ช่อง";
         return;
     }
 
-    // เก็บโจทย์ (4 ตัว)
+    // เก็บโจทย์ (7 ตัว)
     currentProblemDigits = inputString.split('').sort(); 
 
     document.getElementById('setupPage').style.display = 'none';
@@ -111,10 +111,10 @@ function calculate() {
         if (Number.isFinite(res)) {
             resDisplay.innerText = res.toFixed(2);
             
-            // 🔥 เป้าหมายคือ 24 🔥
-            if (Math.abs(res - 24) < 1e-6) {
+            // 🔥 เป้าหมายคือ 100 🔥
+            if (Math.abs(res - 100) < 1e-6) {
                 
-                // ตรวจสอบว่าใช้เลขครบ 4 ตัว และตรงกับโจทย์ไหม
+                // ตรวจสอบว่าใช้เลขครบ 7 ตัว และตรงกับโจทย์ไหม
                 if (checkDigitsMatch(cleanExpr)) {
                     resDisplay.style.color = "#39ff14";
                     msg.innerHTML = "<h2 style='color:#39ff14; text-shadow:0 0 15px #39ff14'>MISSION COMPLETE!</h2>";
@@ -135,12 +135,12 @@ function calculate() {
     }
 }
 
-// เช็คเลข 4 ตัว
+// เช็คเลข 7 ตัว
 function checkDigitsMatch(userEquation) {
     const userDigits = userEquation.match(/[0-9]/g);
     
-    // ต้องมีเลข 4 ตัวเท่านั้น
-    if (!userDigits || userDigits.length !== 4) {
+    // ต้องมีเลข 7 ตัวเท่านั้น
+    if (!userDigits || userDigits.length !== 7) {
         return false; 
     }
 
