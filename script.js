@@ -1,7 +1,5 @@
 const inputs = document.querySelectorAll('.digit-input');
 const setupMsg = document.getElementById('setupMessage');
-
-// เก็บโจทย์ต้นฉบับ
 let currentProblemDigits = []; 
 
 // --- 1. Setup Logic ---
@@ -62,19 +60,21 @@ function resetGame() {
 function setupGameDisplay(digitString) {
     const solutionInput = document.getElementById('playerSolution');
     
-    // ใส่เลขลงกล่อง
     solutionInput.value = digitString; 
     
-    // ห้าม Copy/Paste
+    // ป้องกันการแก้ไขด้วยวิธีปกติ (Mouse/Keyboard)
     solutionInput.onpaste = (e) => e.preventDefault();
     solutionInput.oncut = (e) => e.preventDefault();
     
-    // ระบบล็อกตัวเลข (ไม่ให้พิมพ์เพิ่ม / ไม่ให้ลบตัวเดิม)
     solutionInput.onkeydown = function(e) {
+        // อนุญาตปุ่มควบคุมทิศทาง
         if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Tab'].includes(e.key)) return;
+        
+        // ถ้าคีย์บอร์ดมีปุ่มเครื่องหมายพวกนี้ก็กดได้ (แต่ในมือถือเราปิดคีย์บอร์ดไว้)
         if (['+', '-', '*', '/', '(', ')', '.'].includes(e.key)) return;
 
         if (e.key === 'Backspace') {
+            // Logic ห้ามลบตัวเลข
             const cursorStart = this.selectionStart;
             const cursorEnd = this.selectionEnd;
             if (cursorStart !== cursorEnd) {
@@ -89,18 +89,13 @@ function setupGameDisplay(digitString) {
             return;
         }
 
-        if (e.key === 'Delete') {
-            const charToDelete = this.value[this.selectionStart];
-            if (charToDelete && /[0-9]/.test(charToDelete)) e.preventDefault();
-            return;
-        }
-
-        // บล็อกปุ่มอื่นๆ (รวมถึงตัวเลข)
+        // บล็อกทุกอย่างรวมถึงตัวเลข
         e.preventDefault();
     };
 
     calculate();
-    solutionInput.focus();
+    // ไม่ต้อง auto focus บนมือถือเพราะคีย์บอร์ดจะเด้ง
+    // solutionInput.focus(); 
     solutionInput.oninput = calculate;
 }
 
@@ -111,7 +106,12 @@ function insertText(text) {
 
     const val = input.value;
     input.value = val.slice(0, start) + text + val.slice(end);
+    
+    // ขยับ Cursor ไปหลังตัวที่พิมพ์
     input.selectionStart = input.selectionEnd = start + text.length;
+    
+    // บนมือถือ input จะไม่ focus เพื่อไม่ให้คีย์บอร์ดเด้ง
+    // แต่เรายังต้องคง focus ไว้เพื่อให้พิมพ์ต่อเนื่องได้ถ้าระบบอนุญาต
     input.focus();
     
     calculate();
@@ -120,14 +120,27 @@ function insertText(text) {
 function simulateBackspace() {
     const input = document.getElementById('playerSolution');
     const start = input.selectionStart;
-    if (start === 0) return;
+    const end = input.selectionEnd;
 
-    const charToDelete = input.value[start - 1];
-    if (/[0-9]/.test(charToDelete)) return; // ห้ามลบถ้าเป็นตัวเลข
+    // ถ้ามีการเลือกคลุมดำ (Selection)
+    if (start !== end) {
+        const selectedText = input.value.substring(start, end);
+        if (/[0-9]/.test(selectedText)) return; // ห้ามลบถ้าคลุมโดนเลข
+        
+        const val = input.value;
+        input.value = val.slice(0, start) + val.slice(end);
+        input.selectionStart = input.selectionEnd = start;
+    } else {
+        // ลบปกติทีละตัว
+        if (start === 0) return;
+        const charToDelete = input.value[start - 1];
+        if (/[0-9]/.test(charToDelete)) return; // ห้ามลบเลข
 
-    const val = input.value;
-    input.value = val.slice(0, start - 1) + val.slice(start);
-    input.selectionStart = input.selectionEnd = start - 1;
+        const val = input.value;
+        input.value = val.slice(0, start - 1) + val.slice(start);
+        input.selectionStart = input.selectionEnd = start - 1;
+    }
+    
     input.focus();
     calculate();
 }
@@ -138,23 +151,18 @@ function calculate() {
     const resDisplay = document.getElementById('currentValue');
     const msg = document.getElementById('message');
 
-    // 🔴 1. เช็คว่ามี "เลขโดดต่อกัน" หรือไม่ (Concatenation Check)
-    // RegExp: /\d+/g จะจับกลุ่มตัวเลขทั้งหมด (เช่น "1", "12", "5")
+    // ตรวจสอบเลขโดดติดกัน (Concatenation Check)
     const numberGroups = expr.match(/\d+/g);
-    
     if (numberGroups) {
-        // ถ้ามีกลุ่มไหนยาวกว่า 1 ตัวอักษร (เช่น "12") แสดงว่าเอามาต่อกัน
         const hasConcatenation = numberGroups.some(num => num.length > 1);
-        
         if (hasConcatenation) {
             resDisplay.innerText = "Error";
-            resDisplay.style.color = "#ff3131"; // สีแดง
+            resDisplay.style.color = "#ff3131";
             msg.innerHTML = "<h3 style='color:#ff3131'>ห้ามนำเลขโดดมาต่อกัน!</h3>";
-            return; // หยุดคำนวณทันที
+            return;
         }
     }
 
-    // 🔵 2. เช็ค Validation อื่นๆ
     if (!expr.trim()) {
         resDisplay.innerText = "0.00";
         resDisplay.style.color = "#00d2ff";

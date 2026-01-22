@@ -16,6 +16,7 @@ body {
     margin: 0;
     color: white;
     background-image: radial-gradient(circle at 50% 50%, #1a2230 0%, #0a0f18 100%);
+    overflow-x: hidden; /* ป้องกันเลื่อนซ้ายขวาเกินจอ */
 }
 
 .game-container {
@@ -28,6 +29,7 @@ body {
     max-width: 1000px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 60px rgba(0,0,0,0.7);
+    box-sizing: border-box; /* สำคัญ: รวม padding ในความกว้าง */
 }
 
 h1 {
@@ -77,23 +79,70 @@ p { color: #aaa; margin-bottom: 25px; }
 /* Game UI */
 .solution-area { margin-bottom: 20px; }
 .solution-input {
-    width: 80%; max-width: 600px; padding: 15px 20px;
+    width: 100%; max-width: 600px; padding: 15px;
     font-size: 2rem; font-family: 'Kanit', sans-serif;
     background: rgba(0, 0, 0, 0.6);
     border: 2px solid var(--neon-pink); border-radius: 15px;
     color: var(--neon-pink); text-align: center;
     outline: none; transition: 0.3s;
-    letter-spacing: 2px; /* ห่างนิดนึงให้ดูง่าย */
+    letter-spacing: 2px;
+    box-sizing: border-box;
 }
 .solution-input:focus { box-shadow: 0 0 25px rgba(255, 0, 127, 0.4); background: #000; }
 
-.operator-bank { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+.operator-bank { 
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    margin-bottom: 30px; 
+    flex-wrap: wrap; /* ให้ปุ่มขึ้นบรรทัดใหม่ได้ถ้าจอแคบ */
+}
 .op-btn {
     width: 50px; height: 50px; background: #1e293b;
     border: 1px solid var(--neon-blue); color: #fff;
     border-radius: 10px; font-size: 1.5rem; cursor: pointer;
     transition: 0.2s;
+    /* ป้องกันการแตะซ้ำเร็วๆ บนมือถือ */
+    touch-action: manipulation; 
 }
-.op-btn:hover { background: var(--neon-blue); color: #000; transform: translateY(-2px); }
+.op-btn:hover, .op-btn:active { background: var(--neon-blue); color: #000; transform: translateY(-2px); }
+.backspace-btn { color: #ff3131; border-color: #ff3131; }
 
 #currentValue { font-size: 3.5rem; font-family: 'Orbitron'; color: var(--neon-blue); margin-top:10px; }
+
+/* 🔥 RESPONSIVE DESIGN (สำหรับมือถือ) 🔥 */
+@media (max-width: 600px) {
+    .game-container {
+        padding: 1.5rem 1rem; /* ลดขอบข้าง */
+        width: 95%;
+    }
+
+    h1 { font-size: 2rem; } /* ลดขนาดหัวข้อ */
+
+    /* ปรับช่องกรอกเลข 7 ตัว ให้ย่อได้ */
+    .input-group { gap: 4px; }
+    .digit-input {
+        width: 12%; /* ใช้ % แทน px เพื่อให้พอดีจอ */
+        height: 55px;
+        font-size: 1.8rem;
+        border-radius: 8px;
+        padding: 0;
+    }
+
+    /* กล่องคำตอบ */
+    .solution-input {
+        font-size: 1.5rem;
+        padding: 10px;
+    }
+
+    /* ปุ่มกดเครื่องหมาย */
+    .operator-bank {
+        gap: 8px;
+    }
+    .op-btn {
+        width: 42px; height: 42px;
+        font-size: 1.2rem;
+    }
+
+    #currentValue { font-size: 2.5rem; }
+}
